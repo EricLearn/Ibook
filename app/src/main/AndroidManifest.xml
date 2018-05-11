@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.eric.myapplication"
+    android:installLocation="auto">
+
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"></uses-permission>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+
+        <activity android:name=".BookShelfActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name="com.example.eric.Login.LoginActivity">
+
+        </activity>
+
+        <activity android:name=".module_activity_widget">
+
+        </activity>
+
+        <!-- 声明widget对应的AppWidgetProvider -->
+        <receiver android:name=".WidgetProvider">
+            <intent-filter>
+                <!--这个是必须要有的系统规定-->
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <!--这个是我们自定义的 action ，用来更新UI，还可以自由添加更多 -->
+                <action android:name="com.example.eric.widget.UPDATE_ALL" />
+                <action android:name="com.example.eric.widget.FOLD_WIDGET"/>
+            </intent-filter>
+            <!--要显示的布局-->
+            <meta-data
+                android:name = "android.appwidget.provider"
+                android:resource = "@xml/module_widget_provider_info"/>
+
+        </receiver>
+
+    </application>
+
+</manifest>

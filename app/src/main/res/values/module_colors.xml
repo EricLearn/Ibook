@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="colorWhite">#FFFFFF</color>
+
+    <color name="module_widget_bg_color">#cad5d0</color>
+    <color name="module_widget_bg_top_color">#e6e7e8</color>
+    <color name="module_widget_flod_text_color">#607B8B</color>
+    <color name="module_widget_message_bg_color">#E8484B</color>
+    <color name="module_widget_new_bg_color">#33BA65</color>
+    <color name="module_widget_course_bg_color">#F68C3A</color>
+</resources>

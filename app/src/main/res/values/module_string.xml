@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Demo画风</string>
+    <string name="module_widget_flod">折叠</string>
+
+    <string name="module_widget_message">消息</string>
+    <string name="module_widget_new">新闻</string>
+    <string name="module_widget_course">有课</string>
+
+    <string name="module_activity_login_accout">账号</string>
+    <string name="module_activity_login_password">密码</string>
+    <string name="module_activity_login_text">登录</string>
+</resources>

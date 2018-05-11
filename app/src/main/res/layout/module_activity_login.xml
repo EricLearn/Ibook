@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/login_accout"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:layout_margin="10dp"
+        android:gravity="center_vertical"
+        android:background="@color/module_widget_bg_color"
+        android:text="@string/module_activity_login_accout"/>
+
+    <TextView
+        android:id="@+id/login_password"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:layout_marginTop="1dp"
+        android:layout_margin="10dp"
+        android:gravity="center_vertical"
+        android:background="@color/module_widget_bg_color"
+        android:text="@string/module_activity_login_password"/>
+
+    <Button
+        android:layout_width="60dp"
+        android:layout_height="40dp"
+        android:layout_marginLeft="10dp"
+        android:text="@string/module_activity_login_text"/>
+
+</LinearLayout>
