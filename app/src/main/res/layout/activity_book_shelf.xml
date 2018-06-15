@@ -5,6 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.eric.myapplication.BookShelfActivity">
+    
+    <Button
+        android:id="@+id/start_bt"
+        android:layout_marginTop="40dp"
+        android:layout_marginLeft="40dp"
+        android:layout_width="50dp"
+        android:layout_height="30dp" />
 
     <TextView
         android:id="@+id/text_vw"

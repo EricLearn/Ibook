@@ -1,15 +1,11 @@
 package com.example.eric.Http;
 
 import android.content.Context;
-
+import android.util.Log;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
-
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
-
-import io.reactivex.Observable;
-import io.reactivex.Observer;
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -23,6 +19,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 
 public class RtHttp {
+    
+    private final String TAG = "RtHttp";
+    
     private static RtHttp instance = new RtHttp();
     private static WeakReference<Context> wrContext;
 
@@ -60,7 +59,7 @@ public class RtHttp {
         call.enqueue(new Callback() {
             @Override
             public void onResponse(Call call, Response response) {
-                System.out.print("");
+                Log.d(TAG, response.toString());
             }
 
             @Override

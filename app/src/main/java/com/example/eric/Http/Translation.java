@@ -1,5 +1,7 @@
 package com.example.eric.Http;
 
+import android.util.Log;
+
 /**
  * Created by Eric on 2018/5/3.
  */
@@ -21,6 +23,6 @@ public class Translation {
     }
     //定义 输出返回数据 的方法
     public void show() {
-
+        
     }
 }

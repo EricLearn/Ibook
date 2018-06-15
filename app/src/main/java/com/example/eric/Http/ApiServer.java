@@ -23,4 +23,7 @@ public interface ApiServer {
 
     @GET("{method}")
     Call<Translation> get(@Path("method") String method);
+    
+    @GET("ajax.php?a=fy&f=auto&t=auto&w=hi%20world")
+    Observable<Translation> getcall();
 }
