@@ -2,8 +2,6 @@ package com.example.eric.Http;
 
 /**
  * Created by Eric
- *
- * Http类型区分
  */
 
 public class HttpTypeHelper {

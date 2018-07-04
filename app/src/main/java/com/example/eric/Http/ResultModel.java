@@ -1,10 +1,7 @@
 package com.example.eric.Http;
 
-import okhttp3.Response;
-import okhttp3.ResponseBody;
-
 /**
- * Created by Eric on 2018/7/3.
+ * Created by Eric
  */
 
 public class ResultModel

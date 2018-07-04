@@ -114,6 +114,11 @@ public class HttpClient
         return null;
     }
 
+    /**
+     * 保存Task方便维护
+     * @param task
+     * @param key  已View名+urlPath 为key
+     */
     private void putTask(Call<ResponseBody> task,String key){
         if (key == null) return;
         synchronized (mTaskHold) {
@@ -136,16 +141,13 @@ public class HttpClient
     }
 
     public void cancelAllTask(Object tag){
-
         List<String> list = new ArrayList<>();
-
         synchronized (mTaskHold) {
             for (String key: mTaskHold.keySet()){
                 if (key.contains(tag.toString())){
                     list.add(key);
                 }
             }
-
             for (String sub: list) {
                 cancelTask(sub);
             }
@@ -155,9 +157,7 @@ public class HttpClient
     // 断网 恢复 后    retrofit 不会主动重新完成刚刚的Task
 
     public void start(final TaskCallback callback,final String urlPath){
-
         Call<ResponseBody> task = checkTaskIsExist(urlPath);
-
         if (task == null) {
             if (mBuilder.mHttpMethod == HttpTypeHelper.HttpMethod.HttpMethod_Get) {
                 task = mApiServer.get(urlPath);
@@ -179,7 +179,6 @@ public class HttpClient
      * @param urlPath
      */
     private void load(final TaskCallback callback, Call<ResponseBody> task, final String urlPath){
-
 
         if (callback != null) callback.taskStart(urlPath);
 

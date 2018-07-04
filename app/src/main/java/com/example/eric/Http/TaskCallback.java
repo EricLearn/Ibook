@@ -1,7 +1,7 @@
 package com.example.eric.Http;
 
 /**
- * Created by Eric on 2018/7/3.
+ * Created by Eric
  */
 
 public interface TaskCallback {
