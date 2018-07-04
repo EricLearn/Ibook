@@ -1,5 +1,8 @@
 package com.example.eric.Http;
 
+import okhttp3.Response;
+import okhttp3.ResponseBody;
+
 /**
  * Created by Eric on 2018/7/3.
  */
@@ -7,7 +10,7 @@ package com.example.eric.Http;
 public class ResultModel
 {
     private Object mResult;
-    private HttpTypeHelper.ResultDataType mDataType;
+    private HttpTypeHelper.BodyDataType mDataType;
     private HttpError mError;
 
     public HttpError getError(){
@@ -22,19 +25,19 @@ public class ResultModel
         this.mResult = mResult;
     }
 
-    public Object getmResult() {
+    public Object getResult() {
         return mResult;
     }
 
-    public void setmDataType(HttpTypeHelper.ResultDataType mDataType) {
+    public void setmDataType(HttpTypeHelper.BodyDataType mDataType) {
         this.mDataType = mDataType;
     }
 
-    public HttpTypeHelper.ResultDataType getmDataType() {
+    public HttpTypeHelper.BodyDataType getmDataType() {
         return mDataType;
     }
 
-    public class HttpError
+    public static class HttpError
     {
         private int mCode;
         private String mMsg;
@@ -55,7 +58,7 @@ public class ResultModel
             mCode = code;
         }
 
-        public HttpError(HttpTypeHelper.ErrorCode code, HttpTypeHelper.ErrorMessage message){
+        public HttpError(int code, String message){
             super();
         }
     }

@@ -1,6 +1,9 @@
 package com.example.eric.myapplication.bookshelf;
 
+import android.util.Log;
+
 import com.example.eric.Http.HttpClient;
+import com.example.eric.Http.HttpTypeHelper;
 import com.example.eric.Http.ResultModel;
 import com.example.eric.Http.TaskCallback;
 
@@ -27,6 +30,8 @@ public class BookshelfPresenter implements BookshelfContract.Presenter,TaskCallb
     public void loadBookshelfData() {
         new HttpClient.Builder()
                 .setParams(null)
+                .setBodyDataType(HttpTypeHelper.BodyDataType.JSON_OBJECT)
+                .setParseClass(MovieListEntity.class)
                 .build()
                 .start(this,MoviceTop250_TaskTag);
     }
@@ -49,5 +54,10 @@ public class BookshelfPresenter implements BookshelfContract.Presenter,TaskCallb
     @Override
     public void taskFinish(Object tag, ResultModel result) {
         mView.loadDataFinish(tag,result);
+
+        MovieListEntity entity = (MovieListEntity) result.getResult();
+
+        Log.d("BookshelfPresenter",entity.getTitle());
+
     }
 }

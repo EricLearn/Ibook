@@ -28,10 +28,12 @@ public class DataParseUtil {
 
     /**
      * 当业务层未指定返回数据的类型时，通过匹配的方式确定，不过最好业务层指定
+     * 默认指定为 object  要更换 自己指定
      * @param result
      * @return
      */
-    public HttpTypeHelper.BodyDataType matchDataTypeOfResult(String result) {
+    @Deprecated
+    public static HttpTypeHelper.BodyDataType matchDataTypeOfResult(String result) {
 
         HttpTypeHelper.BodyDataType type = HttpTypeHelper.BodyDataType.UNKNOWN;
         if (result != null) {

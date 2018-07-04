@@ -62,8 +62,8 @@ public class BookshelfActivity extends BaseActivity implements BookshelfContract
     }
 
     @Override
-    public void setPresenter(Object presenter) {
-
+    public void setPresenter(BookshelfContract.Presenter presenter) {
+        this.mPresenter = presenter;
     }
 
     @Override
@@ -74,7 +74,7 @@ public class BookshelfActivity extends BaseActivity implements BookshelfContract
     }
 
     @Override
-    public void loadDataFinish(Object tag, Errors error, ResultModel result) {
+    public void loadDataFinish(Object tag, ResultModel result) {
 
     }
 }

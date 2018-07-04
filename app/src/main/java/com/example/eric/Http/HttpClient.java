@@ -52,7 +52,7 @@ public class HttpClient
     private HttpClient(){
         mOkHttpClient = new OkHttpClient.Builder()
                 .connectTimeout(1000L, TimeUnit.MILLISECONDS)
-                .addInterceptor(new HeaderInterceptor())
+                //.addInterceptor(new HeaderInterceptor())
                 .build();
     }
 
@@ -99,7 +99,7 @@ public class HttpClient
         }
     }
 
-    public void start(final TaskCallback callback,String taskType){
+    public void start(final TaskCallback callback,final String taskType){
 
         Task task = checkTaskIsExist(taskType);
 
@@ -124,42 +124,48 @@ public class HttpClient
      * @param task
      * @param taskType
      */
-    private void load(final TaskCallback callback,Task task,String taskType){
+    private void load(final TaskCallback callback, Task task, final String taskType){
 
         //断网 恢复 后    retrofit 不会主动重新完成刚刚的Task
         if (callback != null) callback.taskStart(taskType);
 
         if (task.getCall() != null) {
             // 同时调用1000次，      callback为不同的对象，不知道会不会出错
-            task.getCall().enqueue(new Callback<Object>() {
+            task.getCall().enqueue(new Callback<ResponseBody>() {
                 @Override
-                public void onResponse(Call<Object> call, retrofit2.Response<Object> response) {
+                public void onResponse(Call<ResponseBody> call, retrofit2.Response<ResponseBody> response) {
                     // 正常连接到服务端 响应了
 
                     ResultModel model = new ResultModel();
 
-                    if (response.isSuccessful()){
-                        Log.d("httpclient","访问成功");
-                        if (response.code() == 200) {
-                            //访问正确
-                            String result = response.body().toString();
+                    if (response.code() == 200) {
+                        //访问正确
+                        try {
+                            String result = response.body().string();
                             Object object = parseData(result,mBuilder.getParseClass(),mBuilder.mBodyType);
                             model.setmResult(object);
                         }
-                        else  {
-                            //访问报错   包括自定义的 errorcode
+                        catch (Exception e) {
+
                         }
+                    }
+                    else  {
+                        //访问报错   包括自定义的 errorcode
+                        ResultModel.HttpError error = new ResultModel.HttpError(response.code(),response.message());
+                        model.setError(error);
+                    }
+
+                    if (response.isSuccessful()){
+                        Log.d("httpclient","访问成功");
                     }
                     else {
                         Log.d("httpclient","访问失败");
-
-                        ResponseBody errorBody = response.errorBody();
-                        int code = response.code();
                     }
+                    if (callback != null)  callback.taskFinish(taskType,model);
                 }
 
                 @Override
-                public void onFailure(Call<Object> call, Throwable t) {
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
                     // 未正常连接到服务端
                     if (call.isCanceled()) {
                         // 主动取消
@@ -208,7 +214,7 @@ public class HttpClient
         for (int i = 0;i < mTaskQueue.size(); i++) {
             Task  sub = mTaskQueue.get(i);
             if (sub.getTag().equals(tag)) {
-                Call<Object> temp = sub.getCall().clone();
+                Call<ResponseBody> temp = sub.getCall().clone();
                 sub.setCall(temp);
                 return sub;
             }
@@ -223,7 +229,7 @@ public class HttpClient
         private String mUrlPath;
         private String mTaskTag;
         private Class  mParseClass;
-        private HttpTypeHelper.BodyDataType mBodyType = HttpTypeHelper.BodyDataType.UNKNOWN;
+        private HttpTypeHelper.BodyDataType mBodyType = HttpTypeHelper.BodyDataType.JSON_OBJECT;
 
         private HashMap<String,String> mParams = new HashMap<>();
 

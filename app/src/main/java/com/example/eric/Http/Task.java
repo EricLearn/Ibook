@@ -1,6 +1,7 @@
 package com.example.eric.Http;
 
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 
 /**
@@ -9,7 +10,7 @@ import retrofit2.Call;
 
 public class Task  {
 
-    private Call<Object> mCall;
+    private Call<ResponseBody> mCall;
     private Object mTag;
 
     public Task(Object tag){
@@ -17,11 +18,11 @@ public class Task  {
         this.mTag = tag;
     }
 
-    public Call<Object> getCall(){
+    public Call<ResponseBody> getCall(){
         return mCall;
     }
 
-    public void setCall(Call<Object> call) {
+    public void setCall(Call<ResponseBody> call) {
         this.mCall = call;
     }
 
