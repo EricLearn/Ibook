@@ -1,15 +1,16 @@
-package com.example.eric.Http;
+package com.example.eric.base;
 
 import java.io.Serializable;
 
 /**
- * Created by Eric on 2018/5/7.
+ * Created by Eric
  */
 
 public class BaseModel implements Serializable {
 
     private int mCode;
     private String mMsg;
+    private Errors mError;
 
     public String  getMsg() {
         return mMsg;
@@ -25,6 +26,14 @@ public class BaseModel implements Serializable {
 
     public void setCode(int code) {
         mCode = code;
+    }
+
+    public Errors getError(){
+        return mError;
+    }
+
+    public void setError(Errors eroor){
+        mError = eroor;
     }
 
     public static <T extends Comparable<T>> T maxmum(T x,T y,T z){

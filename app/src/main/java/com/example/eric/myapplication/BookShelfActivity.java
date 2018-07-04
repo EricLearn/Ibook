@@ -11,25 +11,17 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.eric.Http.ApiServer;
-import com.example.eric.Http.ApiType;
-import com.example.eric.Http.RtHttp;
-import com.example.eric.Http.Translation;
 import com.example.eric.Model.HandlerCenter;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
-import org.reactivestreams.Subscriber;
-import org.reactivestreams.Subscription;
 import java.util.HashMap;
-import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Observer;
-import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -41,6 +33,7 @@ public class BookShelfActivity extends AppCompatActivity implements Handler.Call
     private final int HANDLERSTART = 1;
     
     TextView mTitle_tv;
+
     
     // looper  每个thread有一个looper、queue     在该thread创建handler    注册 
     // handler   创建message：handler与message关联   添加到queue     发送
@@ -147,7 +140,7 @@ public class BookShelfActivity extends AppCompatActivity implements Handler.Call
                 };
 
                 Looper looper = thread_handler.getLooper();
-                looper.getQueue();
+                //looper.getQueue();
             }
         }.start();
         
@@ -159,9 +152,6 @@ public class BookShelfActivity extends AppCompatActivity implements Handler.Call
         HashMap map = new HashMap();
         map.put("key","value");
 
-        //RtHttp.with(this).startTask(ApiType.AppConfig,null);
-        
-        //
         // rxjavaHandler();
 
         rxJavaOperation();
@@ -184,84 +174,6 @@ public class BookShelfActivity extends AppCompatActivity implements Handler.Call
                 .build();
 
         ApiServer request = retrofit.create(ApiServer.class);
-
-        // c. 采用Observable<...>形式 对 网络请求 进行封装
-        Observable<Translation> observable = request.getcall();
-        
-        observable.subscribeOn(Schedulers.io()) // 切换到IO线程进行网络请求
-                .observeOn(AndroidSchedulers.mainThread()) // 切换回到主线程 处理请求结果
-                .subscribe(new Observer<Translation>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
-                        Log.d(TAG,"开始监听");
-                    }
-
-                    @Override
-                    public void onNext(Translation translation) {
-                        Log.d(TAG,"网络访问完成");
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        Log.d(TAG,"网络监听完成");
-                    }
-                });
-        
-        /*Observable.interval(2,1, TimeUnit.SECONDS).doOnNext(new Consumer<Long>() {
-            @Override
-            public void accept(Long aLong) throws Exception {
-                
-                Log.d(TAG,"重复"+ aLong);
-                
-                
-                observable.subscribe(new Observer<Translation>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
-
-                    }
-
-                    @Override
-                    public void onNext(Translation result) {
-                        result.show() ;
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
-                });
-            }
-        }).subscribe(new Observer<Long>() {
-            @Override
-            public void onSubscribe(Disposable d) {
-                
-            }
-
-            @Override
-            public void onNext(Long aLong) {
-                Log.d(TAG,"外部测试");
-            }
-
-            @Override
-            public void onError(Throwable e) {
-
-            }
-
-            @Override
-            public void onComplete() {
-
-            }
-        });*/
     }
     
     private void rxjavaHandler() {

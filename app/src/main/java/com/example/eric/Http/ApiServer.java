@@ -1,29 +1,27 @@
 package com.example.eric.Http;
 
-import org.json.JSONObject;
+import java.util.List;
 
 import io.reactivex.Observable;
 import okhttp3.RequestBody;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
-import retrofit2.http.Query;
 
 /**
- * Created by Eric on 2018/5/2.
+ * Created by Eric
  */
 
 public interface ApiServer {
 
-    @POST("{method}")
-    Call<Translation> post(@Path("method") String method, @Body RequestBody  entery);
+    @POST("{path}")
+    Call<Object> post(@Path("path") String path, @Body RequestBody  entery);
 
-    @GET("{method}")
-    Call<Translation> get(@Path("method") String method);
+    @GET("{path}")
+    Call<Object> get(@Path("path") String path);
     
     @GET("ajax.php?a=fy&f=auto&t=auto&w=hi%20world")
-    Observable<Translation> getcall();
+    Observable<ResultModel> getcall();
 }
