@@ -46,7 +46,7 @@ public class BookshelfActivity extends BaseActivity implements BookshelfContract
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mPresenter.cancelTask(this);
+        mPresenter.cancelTask();
     }
 
     @Override
@@ -57,7 +57,7 @@ public class BookshelfActivity extends BaseActivity implements BookshelfContract
     private void onStartButton() {
         // 我要开始加载数据
         // 问 P 拿数据
-        //mPresenter.start();
+        mPresenter.loadBookshelfData();
         mPresenter.loadBookshelfData();
     }
 

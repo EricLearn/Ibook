@@ -19,6 +19,8 @@ public class BookshelfPresenter implements BookshelfContract.Presenter,TaskCallb
 
     private static String mBaseUrl = "";
 
+    private int count = 0;
+
     BookshelfContract.View mView;
 
     public BookshelfPresenter(@NonNull BookshelfContract.View view) {
@@ -42,22 +44,25 @@ public class BookshelfPresenter implements BookshelfContract.Presenter,TaskCallb
     }
 
     @Override
-    public void cancelTask(Object tag) {
-
+    public void cancelTask() {
+        HttpClient.getInstance().cancelAllTask(this);
     }
 
     @Override
     public void taskStart(Object tag) {
         mView.startLoadData(tag);
+
+        Log.d("BookshelfPresenter","加载数据 :" + count++ + "次");
     }
 
     @Override
     public void taskFinish(Object tag, ResultModel result) {
         mView.loadDataFinish(tag,result);
 
-        MovieListEntity entity = (MovieListEntity) result.getResult();
+        if (result.getError() == null) {
+            MovieListEntity entity = (MovieListEntity) result.getResult();
 
-        Log.d("BookshelfPresenter",entity.getTitle());
-
+            Log.d("BookshelfPresenter",entity.getTitle());
+        }
     }
 }

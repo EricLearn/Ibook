@@ -37,7 +37,7 @@ public class ResultModel
         return mDataType;
     }
 
-    public static class HttpError
+    public class HttpError
     {
         private int mCode;
         private String mMsg;
@@ -60,6 +60,8 @@ public class ResultModel
 
         public HttpError(int code, String message){
             super();
+            mCode = code;
+            this.mMsg = message;
         }
     }
 }

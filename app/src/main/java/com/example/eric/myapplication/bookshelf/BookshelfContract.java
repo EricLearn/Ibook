@@ -29,6 +29,6 @@ public interface BookshelfContract {
         void loadBookshelfData();
         void deleteBook();
 
-        void cancelTask(Object tag);
+        void cancelTask();
     }
 }

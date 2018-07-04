@@ -1,9 +1,11 @@
 package com.example.eric.Http;
 
+import android.support.annotation.NonNull;
 import android.util.Log;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
@@ -25,24 +27,18 @@ public class HttpClient
 {
     private static String BASE_URL = "https://api.douban.com/";
 
+    private static volatile HttpClient INSTANCE;
+
     private static OkHttpClient mOkHttpClient;
     private static Retrofit mRetrofitClient;
     private static ApiServer mApiServer;
 
-    private ArrayList<Task> mTaskQueue = new ArrayList<>();
+    private HashMap<String,Call<ResponseBody>> mTaskHold = new HashMap<>();
 
     private Builder mBuilder;
 
     public Builder getBuilder(){
         return mBuilder;
-    }
-
-    private static HttpClient getIns(){
-        return HttpClientHolder.sInstance;
-    }
-
-    private static class HttpClientHolder{
-        private  static final HttpClient sInstance = new HttpClient();
     }
 
     private void setBuilder(Builder builder){
@@ -54,6 +50,17 @@ public class HttpClient
                 .connectTimeout(1000L, TimeUnit.MILLISECONDS)
                 //.addInterceptor(new HeaderInterceptor())
                 .build();
+    }
+
+    public static HttpClient getInstance() {
+        if (INSTANCE == null) {
+            synchronized (HttpClient.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = new HttpClient();
+                }
+            }
+        }
+        return INSTANCE;
     }
 
     private RequestBody body(HashMap params){
@@ -88,33 +95,80 @@ public class HttpClient
         }
     }
 
-    public void cancel(Object tag){
-        for (int i = 0;i < mTaskQueue.size(); i++) {
-            Task sub = mTaskQueue.get(i);
-            if (sub.getTag().equals(tag)) {
-                if (sub.getCall().isCanceled() == false)  {
-                    sub.getCall().cancel();
+    /**
+     * 任务的复用  只有成功的任务才会从队列移除，所以如果报错的可以直接复用。
+     * 同时同一个task多次调用之后，直接使用clone，被clone之后前一次调用会cancal，调用只会访问一次。
+     * retrofit中call的clone
+     * @param urlPath
+     * @return
+     */
+    private Call<ResponseBody> checkTaskIsExist(String urlPath){
+        synchronized (mTaskHold){
+            for (String key: mTaskHold.keySet()){
+                if (key.contains(urlPath)){
+                    Call<ResponseBody> call = mTaskHold.get(key);
+                    return call.clone();
                 }
+            }
+        }
+        return null;
+    }
+
+    private void putTask(Call<ResponseBody> task,String key){
+        if (key == null) return;
+        synchronized (mTaskHold) {
+            mTaskHold.put(key,task);
+        }
+    }
+
+    public void cancelTask(String urlPath){
+        synchronized (mTaskHold){
+            for (String key: mTaskHold.keySet()){
+                if (key.contains(urlPath)){
+                    Call<ResponseBody> call = mTaskHold.get(key);
+                    call.cancel();
+                    urlPath = key;
+                    break;
+                }
+            }
+            mTaskHold.remove(urlPath);
+        }
+    }
+
+    public void cancelAllTask(Object tag){
+
+        List<String> list = new ArrayList<>();
+
+        synchronized (mTaskHold) {
+            for (String key: mTaskHold.keySet()){
+                if (key.contains(tag.toString())){
+                    list.add(key);
+                }
+            }
+
+            for (String sub: list) {
+                cancelTask(sub);
             }
         }
     }
 
-    public void start(final TaskCallback callback,final String taskType){
+    // 断网 恢复 后    retrofit 不会主动重新完成刚刚的Task
 
-        Task task = checkTaskIsExist(taskType);
+    public void start(final TaskCallback callback,final String urlPath){
+
+        Call<ResponseBody> task = checkTaskIsExist(urlPath);
 
         if (task == null) {
-            task = new Task(taskType);
             if (mBuilder.mHttpMethod == HttpTypeHelper.HttpMethod.HttpMethod_Get) {
-                task.setCall(mApiServer.get(taskType));
+                task = mApiServer.get(urlPath);
             }
             else {
-                task.setCall(mApiServer.post(taskType,body(null)));
+                task = mApiServer.post(urlPath,body(null));
             }
-            mTaskQueue.add(task);
+            putTask(task,callback.toString() + urlPath);
         }
 
-        load(callback,task,taskType);
+        load(callback,task,urlPath);
     }
 
     /**
@@ -122,16 +176,16 @@ public class HttpClient
      *
      * @param callback
      * @param task
-     * @param taskType
+     * @param urlPath
      */
-    private void load(final TaskCallback callback, Task task, final String taskType){
+    private void load(final TaskCallback callback, Call<ResponseBody> task, final String urlPath){
 
-        //断网 恢复 后    retrofit 不会主动重新完成刚刚的Task
-        if (callback != null) callback.taskStart(taskType);
 
-        if (task.getCall() != null) {
+        if (callback != null) callback.taskStart(urlPath);
+
+        if (task != null) {
             // 同时调用1000次，      callback为不同的对象，不知道会不会出错
-            task.getCall().enqueue(new Callback<ResponseBody>() {
+            task.enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(Call<ResponseBody> call, retrofit2.Response<ResponseBody> response) {
                     // 正常连接到服务端 响应了
@@ -145,13 +199,13 @@ public class HttpClient
                             Object object = parseData(result,mBuilder.getParseClass(),mBuilder.mBodyType);
                             model.setmResult(object);
                         }
-                        catch (Exception e) {
-
+                        catch (IOException | IllegalStateException e) {
+                            e.printStackTrace();
                         }
                     }
                     else  {
                         //访问报错   包括自定义的 errorcode
-                        ResultModel.HttpError error = new ResultModel.HttpError(response.code(),response.message());
+                        ResultModel.HttpError error = model.new HttpError(response.code(),response.message());
                         model.setError(error);
                     }
 
@@ -161,7 +215,8 @@ public class HttpClient
                     else {
                         Log.d("httpclient","访问失败");
                     }
-                    if (callback != null)  callback.taskFinish(taskType,model);
+                    cancelTask(urlPath);
+                    if (callback != null)  callback.taskFinish(urlPath, model);
                 }
 
                 @Override
@@ -179,7 +234,7 @@ public class HttpClient
     }
 
     /**
-     * 解析返回的数据
+     * 解析返回的数据：解析类独立 方便随时替换解析库
      *  @param result
      */
     private Object parseData(String result, Class parseClass, HttpTypeHelper.BodyDataType bodyType) {
@@ -198,28 +253,9 @@ public class HttpClient
                 //onResultListener.onSuccess(DataParseUtil.parseXml(data, clazz));
                 break;
             default:
-                //Logger.e("http parse tip:", "if you want return object, please use bodyType() set data type");
                 break;
         }
         return object;
-    }
-
-    /**
-     * 任务的复用  只有成功的任务才会从队列移除，所以如果报错的可以直接复用。
-     * retrofit中call的clone
-     * @param tag
-     * @return
-     */
-    private Task checkTaskIsExist(Object tag){
-        for (int i = 0;i < mTaskQueue.size(); i++) {
-            Task  sub = mTaskQueue.get(i);
-            if (sub.getTag().equals(tag)) {
-                Call<ResponseBody> temp = sub.getCall().clone();
-                sub.setCall(temp);
-                return sub;
-            }
-        }
-        return null;
     }
 
     public static final class Builder
@@ -227,7 +263,6 @@ public class HttpClient
         private int mHttpMethod = HttpTypeHelper.HttpMethod.HttpMethod_Get;
         private String mBaseUrl = "";
         private String mUrlPath;
-        private String mTaskTag;
         private Class  mParseClass;
         private HttpTypeHelper.BodyDataType mBodyType = HttpTypeHelper.BodyDataType.JSON_OBJECT;
 
@@ -242,11 +277,6 @@ public class HttpClient
 
         public Builder urlPath(String path) {
             this.mUrlPath = path;
-            return this;
-        }
-
-        public Builder setTaskTag(String taskTag) {
-            this.mTaskTag = taskTag;
             return this;
         }
 
@@ -283,12 +313,8 @@ public class HttpClient
             return mBaseUrl;
         }
 
-        public String getTaskTag(){
-            return mTaskTag;
-        }
-
         public HttpClient build(){
-            HttpClient client = HttpClient.getIns();
+            HttpClient client = HttpClient.getInstance();
             client.setBuilder(this);
             client.getRetrofit();
             return  client;
